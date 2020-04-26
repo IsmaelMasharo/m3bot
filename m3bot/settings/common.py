@@ -21,7 +21,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '-w*@m3nx%+(c#^1bo@y(#7$1mryj3ikdoqzxu1=6t)v815-+v!'
+SECRET_KEY = os.environ['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -121,26 +121,25 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-VERIFY_TOKEN= '4^_qs?Nx$:XsaY;8'
 
-COMMAND_IDENTIFIER = '/'
-COMMAND_INDEX_AT = 0
+# APP APIs USED
+FACEBOOK_VERIFY_TOKEN= os.environ['FACEBOOK_VERIFY_TOKEN']
+FACEBOOK_PAGE_ACCESS_TOKEN = os.environ['FACEBOOK_PAGE_ACCESS_TOKEN']
+MUSIXMATCH_KEY = os.environ['MUSIXMATCH_KEY']
+SPOTIFY_CLIENT_ID = os.environ['SPOTIFY_CLIENT_ID']
+SPOTIFY_CLIENT_SECRET_ID = os.environ['SPOTIFY_CLIENT_SECRET_ID']
 
+MUSIXMATCH_ENTRY = "https://api.musixmatch.com/ws/1.1/"
+FACEBOOK_GRAPH = 'https://graph.facebook.com/v2.6/'
+MESSAGES_ENTRY = FACEBOOK_GRAPH + 'me/messages'
+FB_URL = MESSAGES_ENTRY + '?access_token=' + FACEBOOK_PAGE_ACCESS_TOKEN
+
+# APP CONFIGS
 MESSAGE_HOOK = 'message'
 POSTBACK_HOOK = 'postback'
 SUPPORTED_FB_HOOKS = [MESSAGE_HOOK, POSTBACK_HOOK]
 
 SESSION_TIME_THRESHOLD = datetime.timedelta(minutes=10)
-
 DEFAULT_RECORDS_SIZE = 10
-
-MUSIXMATCH_KEY = '47b674f3a0dd4389fa4cce1c9f629f39'
-MUSIXMATCH_ENTRY = "https://api.musixmatch.com/ws/1.1/"
-
-PAGE_TOKEN = 'EAAIfovoTi5UBACkhAfv72or2uu0hcRMuOPc6NKR9qBGwDF8k9MUxtYMdHcYdcRhKrOdqxCNIFoRLZALZCQMwIzelwE735UAu7tB18YIVam7j7L013ZAVH6AwitS40GIP1OMzKT3s7XshSfOPwcJu2kx6mQ7LBsL1EKjGWIADAZDZD'
-FACEBOOK_GRAPH = 'https://graph.facebook.com/v2.6/'
-MESSAGES_ENTRY = FACEBOOK_GRAPH + 'me/messages'
-FB_URL = MESSAGES_ENTRY + '?access_token=' + PAGE_TOKEN
-
-SPOTIFY_CLIENT_ID = 'd1ca9c0d2afc4e3c9869e3bac41a2c24'
-SPOTIFY_CLIENT_SECRET_ID = '4a2985ad9df0475697113dd2c078a449'
+COMMAND_INDEX_AT = 0
+COMMAND_IDENTIFIER = '/'

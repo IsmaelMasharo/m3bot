@@ -45,6 +45,12 @@ class BotUser(models.Model):
         }
         self._send(msg)
 
+    def favorites_text(self):
+        msg = "These are your favorite songs:\n"
+        for favorite in self.favorites.all():
+            msg += "- " + str(favorite) + "\n"
+        return msg
+
     def __str__(self):
         return self.psid
 

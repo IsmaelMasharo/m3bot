@@ -2,6 +2,7 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from .models import MessageEvent
+from .statistics import stats_text
 import json
 
 from .musixmatch import track_search
@@ -56,10 +57,19 @@ def webhook_messenger(request):
                 user.favorites.add(track)
                 user.send_text("\"" + track.track_name + "\" saved as favorite.")
 
+        elif event.type == MessageEvent.COMMAND:
+            if event.text == "/stat":
+                msg = stats_text()
+            elif event.text == "/fav":
+                msg = user.favorites_text()
+            else:
+                msg = "Try the /stat or /fav commands."
+            user.send_text(msg)
+
         return response
 
     elif request.method == 'GET':
-        verify_token = settings.VERIFY_TOKEN
+        verify_token = settings.FACEBOOK_VERIFY_TOKEN
         query = request.GET
 
         if 'hub.mode' in query and 'hub.verify_token' in query:

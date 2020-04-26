@@ -45,5 +45,5 @@ def get_cover_data(artist_name, track_name):
     else:
         sp_track = sp_track['tracks']['items']
         if sp_track and sp_track[0]['album']['images']:
-            cover_url = sp_track['album']['images'][0]['url']
+            cover_url = sp_track[0]['album']['images'][0]['url']
     return cover_url
