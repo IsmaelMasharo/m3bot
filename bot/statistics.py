@@ -1,4 +1,4 @@
-from django.db.models import Count, Avg, F, Func
+from django.db.models import Count, Avg, F
 
 def stats_text():
     from .models import BotUser, MxmTrack, UserSession
@@ -23,13 +23,9 @@ def stats_text():
         msg += "- " + str(song) + "\n"
 
     # Average session length
-    return msg
-    avg_s = UserSession.objects.annotate(
-        duration = Func(F('end_date'), F('start_date'), function='age')
-    )
-
-    print(avg_s)
-    return msg
-    msg += "Average user session length: " + str(avg_s['average_session']) + "\n"
+    # avg_s = UserSession.objects.aggregate(
+    #     average_session=Avg(F('end_time') - F('start_time'))
+    # )
+    # msg += "Average user session length: " + str(avg_s['average_session']) + "\n"
 
     return msg
