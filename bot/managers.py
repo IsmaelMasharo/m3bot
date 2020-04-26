@@ -22,7 +22,7 @@ def save_user_session(sender):
 class MessageManager(models.Manager):
 
     def create_message(self, query):
-        from .models import BotUser, MessageEvent
+        from .models import BotUser, MessageEvent, MxmTrack
 
         [messaging] = query['entry'][-1]['messaging']
 
@@ -58,7 +58,15 @@ class MessageManager(models.Manager):
             event.type=event_type
 
         elif hook_type == settings.POSTBACK_HOOK:
-            pass
+            commontrack_id = hook_payload['payload']
+            try:
+                track = MxmTrack.objects.get(commontrack_id=commontrack_id)
+            except ObjectDoesNotExist as e:
+                print(e)
+                raise ValueError
+            else:
+                event.related_track = track
+                event.type = MessageEvent.FAVORITE
 
         event.save()
 

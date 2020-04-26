@@ -8,7 +8,7 @@ class BotUser(models.Model):
     """
     """
     psid = models.TextField(unique=True)
-
+    favorites = models.ManyToManyField('MxmTrack')
 
     def _build_message(self):
         msg = {
@@ -117,12 +117,12 @@ class MxmTrack(models.Model):
             }
         }
 
-        # if not user.favorites.filter(commontrack_id=self.commontrack_id).exists():
-        msg['buttons'] = [{
-            'type': 'postback',
-            'title': 'Favorite',
-            'payload': str(self.commontrack_id)
-        }]
+        if not user.favorites.filter(commontrack_id=self.commontrack_id).exists():
+            msg['buttons'] = [{
+                'type': 'postback',
+                'title': 'Favorite',
+                'payload': str(self.commontrack_id)
+            }]
 
         return msg
 

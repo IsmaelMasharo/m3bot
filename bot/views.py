@@ -33,9 +33,7 @@ def webhook_messenger(request):
             return response
         else:
             user = event.sender
-            # Mark that we've seen the message
             user.send_action('mark_seen')
-            # Signal that we are writing a message
             user.send_action('typing_on')
 
         if event.type == MessageEvent.LYRICS:
@@ -50,8 +48,15 @@ def webhook_messenger(request):
             else:
                 user.send_text("Couldn't contact the lyrics service.")
 
-        return response
+        elif event.type == MessageEvent.FAVORITE:
+            track = event.related_track
+            if user.favorites.filter(commontrack_id=track.commontrack_id).exists():
+                user.send_text("\"" + track.track_name + "\" already saved.")
+            else:
+                user.favorites.add(track)
+                user.send_text("\"" + track.track_name + "\" saved as favorite.")
 
+        return response
 
     elif request.method == 'GET':
         verify_token = settings.VERIFY_TOKEN
