@@ -35,7 +35,6 @@ class MessageManager(models.Manager):
         if query.get('object') != 'page':
             raise ValueError("page attribute not found.")
 
-
         psid = messaging['sender']['id']
         sender, _ = BotUser.objects.get_or_create(psid=str(psid))
         save_user_session(sender)

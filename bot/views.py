@@ -37,26 +37,18 @@ def webhook_messenger(request):
 
 
     elif request.method == 'GET':
-        # Facebook uses a GET for subscription to the webhook.
-
-        # Hard-coded token for verification used by Facebook.
         verify_token = settings.VERIFY_TOKEN
-        # Contents of the GET request.
         query = request.GET
 
-        # We now verify the request has the appropriate form.
         if 'hub.mode' in query and 'hub.verify_token' in query:
             mode = query['hub.mode']
             token = query['hub.verify_token']
             challenge = query.get('hub.challenge')
 
-            # Check the mode of the query is subscribe, and whether the token matches.
             if mode == 'subscribe' and token == verify_token:
-                # The token matched! Send the challenge back to verify.
                 response.content = challenge
                 response.status_code = 200
             else:
-                # Forbidden: The token didn't match.
                 response.status_code = 403
 
     return response
