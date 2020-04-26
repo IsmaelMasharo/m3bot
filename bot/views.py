@@ -2,10 +2,9 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from .models import MessageEvent
-
 import json
 
-# from .musixmatch import track_search
+from .musixmatch import track_search
 # import json, sys, traceback
 
 
@@ -32,6 +31,24 @@ def webhook_messenger(request):
         except ValueError as e:
             print(e)
             return response
+        else:
+            user = event.sender
+            # Mark that we've seen the message
+            user.send_action('mark_seen')
+            # Signal that we are writing a message
+            user.send_action('typing_on')
+
+        if event.type == MessageEvent.LYRICS:
+            mxm = track_search(event.text)
+
+            if mxm.status == 200:
+                if mxm.tracks:
+                    mxm.tracks = mxm.tracks[:settings.DEFAULT_RECORDS_SIZE]
+                    user.send_list_tracks(mxm.tracks)
+                else:
+                    user.send_text("Couldn't find lyrics.")
+            else:
+                user.send_text("Couldn't contact the lyrics service.")
 
         return response
 

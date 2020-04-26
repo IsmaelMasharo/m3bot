@@ -1,12 +1,52 @@
 from django.db import models
-from .managers import MessageManager 
+from django.conf import settings
+from .managers import MessageManager, TrackManager
 import datetime
+import requests
 
 class BotUser(models.Model):
     """
     """
     psid = models.TextField(unique=True)
 
+
+    def _build_message(self):
+        msg = {
+            'recipient': {'id': self.psid}
+        }
+        return msg
+
+    def _send(self, msg):
+        response = requests.post(settings.FB_URL, json=msg)
+
+    def send_action(self, action):
+        msg = self._build_message()
+        msg['sender_action'] = action
+        self._send(msg)
+
+    def send_text(self, text):
+        msg = self._build_message()
+        msg['message'] = {'text': text}
+        msg['messaging_type'] = 'RESPONSE'
+        self._send(msg)
+
+    def send_list_tracks(self, tracks):
+        msg = self._build_message()
+        msn_tracks = [track.messenger_track(self) for track in tracks]
+        msg['message'] = {
+            'attachment': {
+                'type': 'template',
+                'payload': {
+                    'template_type': 'generic',
+                    'sharable': 'true',
+                    'elements': msn_tracks
+                }
+            }
+        }
+        self._send(msg)
+
+    def __str__(self):
+        return self.psid
 
 class UserSession(models.Model):
     """
@@ -56,8 +96,10 @@ class MxmTrack(models.Model):
     album_id = models.PositiveIntegerField()
     album_name = models.TextField()
     artist_id = models.PositiveIntegerField()
-    image_url = models.URLField(null=True, max_length=500)
+    image_url = models.URLField(null=True', max_length=500)
     track_url = models.URLField(default='https://www.musixmatch.com/', max_length=500)
+
+    objects = TrackManager()
 
     def messenger_track(self, user):
         """
@@ -75,12 +117,12 @@ class MxmTrack(models.Model):
             }
         }
 
-        if not user.favorites.filter(commontrack_id=self.commontrack_id).exists():
-            msg['buttons'] = [{
-                'type': 'postback',
-                'title': 'Favorite',
-                'payload': str(self.commontrack_id)
-            }]
+        # if not user.favorites.filter(commontrack_id=self.commontrack_id).exists():
+        msg['buttons'] = [{
+            'type': 'postback',
+            'title': 'Favorite',
+            'payload': str(self.commontrack_id)
+        }]
 
         return msg
 

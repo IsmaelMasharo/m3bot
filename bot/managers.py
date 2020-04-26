@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils.timezone import now
+from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.conf import settings
+from .spotify import get_cover_data
 
 def save_user_session(sender):
     from .models import UserSession
@@ -61,3 +63,52 @@ class MessageManager(models.Manager):
         event.save()
 
         return event
+
+class TrackManager(models.Manager):
+
+    def get_or_create_track(self, data):
+        from .models import MxmTrack
+
+        created = False
+        try:
+            track = MxmTrack.objects.get(commontrack_id=data['commontrack_id'])
+        except ObjectDoesNotExist:
+            track = self.create_track(data)
+            created = True
+        return track, created
+
+    def create_track(self, data):
+        from .models import MxmTrack
+
+        try:
+            commontrack_id = data['commontrack_id']
+            artist_name = data['artist_name']
+            track_name = data['track_name']
+            artist_id = data['artist_id']
+            album_id = data['album_id']
+            album_name = data['album_name']
+            track_url = data['track_share_url']
+            try:
+                vanity_id = data['commontrack_vanity_id']
+            except KeyError:
+                vanity_id = artist_name + " - " + track_name
+
+            cover_url = get_cover_data(artist_name, track_name)
+
+            track = MxmTrack(
+                commontrack_id=commontrack_id,
+                artist_name=artist_name,
+                track_name=track_name,
+                artist_id=artist_id,
+                album_id=album_id,
+                image_url=cover_url,
+                track_url=track_url,
+                album_name=album_name,
+                vanity_id=vanity_id
+            )
+            track.save()
+            return track
+        except (ValidationError, KeyError, AttributeError) as e:
+            print(e)
+            raise ValueError("The data doesn't have the form of a track.")
+
