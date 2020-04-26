@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+import datetime
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -121,3 +122,12 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 VERIFY_TOKEN= '4^_qs?Nx$:XsaY;8'
+
+COMMAND_IDENTIFIER = '/'
+COMMAND_INDEX_AT = 0
+
+MESSAGE_HOOK = 'message'
+POSTBACK_HOOK = 'postback'
+SUPPORTED_FB_HOOKS = [MESSAGE_HOOK, POSTBACK_HOOK]
+
+SESSION_TIME_THRESHOLD = datetime.timedelta(minutes=10)

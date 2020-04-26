@@ -1,16 +1,16 @@
-from django.http import HttpResponse, HttpRequest
+from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
+from .models import MessageEvent
 
 import json
 
-# from .models import MessageEvent, stats_text
 # from .musixmatch import track_search
 # import json, sys, traceback
 
 
 @csrf_exempt
-def webhook_messenger(request: HttpRequest):
+def webhook_messenger(request):
     """
     View that interacts with the Facebook Messenger API.
 
@@ -25,9 +25,14 @@ def webhook_messenger(request: HttpRequest):
     response.content = 'OK'
 
     if request.method == 'POST':
-        # Responding to a Messenger API request.
         query = json.loads(request.body)
-        print(query)
+
+        try:
+            event = MessageEvent.objects.create_message(query)
+        except ValueError as e:
+            print(e)
+            return response
+
         return response
 
 
