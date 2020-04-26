@@ -3,11 +3,11 @@ from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from .models import MessageEvent
 from .statistics import stats_text
-import json
-
 from .musixmatch import track_search
-# import json, sys, traceback
+import json
+import logging
 
+logger = logging.getLogger(__name__)
 
 @csrf_exempt
 def webhook_messenger(request):
@@ -29,8 +29,8 @@ def webhook_messenger(request):
 
         try:
             event = MessageEvent.objects.create_message(query)
-        except ValueError as e:
-            print(e)
+        except Exception as e:
+            logger.exception("MessageEvent creation failed. %s" %str(e))
             return response
         else:
             user = event.sender

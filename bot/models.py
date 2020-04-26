@@ -69,7 +69,6 @@ class UserSession(models.Model):
     def __str__(self):
         return str(self.start_time) + " to " + str(self.end_time)
 
-
 class MessageEvent(models.Model):
     """
     """

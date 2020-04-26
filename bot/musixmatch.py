@@ -1,6 +1,8 @@
 from django.conf import settings
 import requests
+import logging
 
+logger = logging.getLogger(__name__)
 
 class MxmResponse:
     """
@@ -38,7 +40,9 @@ def track_search(lyrics):
     }
     try:
         response = requests.get(mxm_url, params=data, timeout=1)
-    except requests.exceptions.ConnectionError:
+    except requests.exceptions.ConnectionError as e:
+        logger.error("MusixMatch connection error. %s" %str(e))
+
         response = {
             'message': {
                 'header': {'status_code': 500},
@@ -48,6 +52,3 @@ def track_search(lyrics):
         return MxmResponse(response)
     else:
         return MxmResponse(response.json())
-
-
-# def album_cover_search()
