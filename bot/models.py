@@ -96,7 +96,7 @@ class MxmTrack(models.Model):
     album_id = models.PositiveIntegerField()
     album_name = models.TextField()
     artist_id = models.PositiveIntegerField()
-    image_url = models.URLField(null=True', max_length=500)
+    image_url = models.URLField(null=True, max_length=500)
     track_url = models.URLField(default='https://www.musixmatch.com/', max_length=500)
 
     objects = TrackManager()
