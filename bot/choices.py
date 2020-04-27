@@ -11,6 +11,6 @@ class MessageEventTypes:
 
 class CommandTypes:
     STATISTICS = '/stats'
-    FAVORITES = '/fav'
+    FAVORITES = '/favs'
 
     LIST = [STATISTICS, FAVORITES]
