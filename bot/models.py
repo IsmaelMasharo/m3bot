@@ -62,10 +62,6 @@ class UserSession(models.Model):
     start_time = models.DateTimeField(auto_now_add=True)
     end_time = models.DateTimeField(auto_now=True)
 
-    @property
-    def duration(self):
-        return self.end_time - self.start_time
-
     def __str__(self):
         return str(self.start_time) + " to " + str(self.end_time)
 

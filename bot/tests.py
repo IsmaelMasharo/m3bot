@@ -16,7 +16,7 @@ class WebhookTests(TestCase):
             "message_id": "mid.$cAAa-4cvO"
         }
 
-        responses.add(responses.POST, settings.FB_URL, status=200,json=payload)
+        responses.add(responses.POST, settings.FB_URL, status=200,json=self.payload)
 
     def create_message_event(self, messaging):
         """
@@ -34,7 +34,7 @@ class WebhookTests(TestCase):
         challenge = "challenge-string"
         data = {
             'hub.mode': 'subscribe',
-            'hub.verify_token': settings.VERIFY_TOKEN,
+            'hub.verify_token': settings.FACEBOOK_VERIFY_TOKEN,
             'hub.challenge': challenge
         }
         c = Client()
