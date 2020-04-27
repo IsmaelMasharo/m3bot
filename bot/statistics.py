@@ -26,7 +26,7 @@ def stats_text():
     avg_s = UserSession.objects.aggregate(
         average_session=Avg(F('end_time') - F('start_time'))
     )
-    average + str(avg_s['average_session']).split(".")[0]
+    average = str(avg_s['average_session']).split(".")[0]
     msg += "Tiempo promedio por sesión: %s" % average + "\n"
 
     return msg
