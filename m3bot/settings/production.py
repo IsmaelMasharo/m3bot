@@ -1,7 +1,7 @@
-from .base import *
+from .common import *
 
 DEBUG = False
-ALLOWED_HOSTS = ["musixbot.herokuapp.com"]
+ALLOWED_HOSTS = ["https://5f86fd97.ngrok.io", "http://3.84.82.107/"]
 
 DATABASES = {
     'default': {
