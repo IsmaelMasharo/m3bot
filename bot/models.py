@@ -1,6 +1,9 @@
 from django.db import models
 from django.conf import settings
 from .managers import MessageManager, TrackManager
+from .musixmatch import track_search
+from .statistics import stats_text
+from .choices import CommandTypes, MessageEventTypes
 import datetime
 import requests
 
@@ -69,20 +72,54 @@ class MessageEvent(models.Model):
     """
     """
 
-    LYRICS = 'LY'
-    FAVORITE = 'FA'
-    COMMAND = 'CO'
-    MESSAGE_TYPES = (
-        (LYRICS, 'Lyrics'),
-        (COMMAND, 'Command'),
-        (FAVORITE, 'Favorite')
+    text = models.TextField(blank=True)
+    sender = models.ForeignKey('BotUser', on_delete=models.CASCADE)
+    type = models.CharField(max_length=2,
+        choices=MessageEventTypes.CHOICES, default=MessageEventTypes.LYRICS
     )
 
-    text = models.TextField(blank=True)
-    type = models.CharField(max_length=2, choices=MESSAGE_TYPES, default=LYRICS)
-    sender = models.ForeignKey('BotUser', on_delete=models.CASCADE)
-
     objects = MessageManager()
+
+    def handle_event(self):
+        """
+        """
+        response = ''
+
+        if self.type == self.LYRICS:
+            mxm = track_search(self.text)
+
+            if mxm.status == 200:
+                if mxm.tracks:
+                    mxm.tracks = mxm.tracks[:settings.DEFAULT_RECORDS_SIZE]
+                    return self.sender.send_list_tracks(mxm.tracks)
+                else:
+                    response = "No encontramos canciones :("
+            else:
+                response = "Ups, tuvimos inconvenientes en la búsqueda :o"
+
+        elif self.type == self.FAVORITE:
+            track = self.related_track
+            favorites = self.sender.favorites.filter(
+                commontrack_id=track.commontrack_id
+            )
+            if favorites.exists():
+                response = "*%s* sigue siendo tu favorita :)" % track.track_name
+            else:
+                self.sender.favorites.add(track)
+                response = "Guardamos *%s* como tu favorita!" % track.track_name
+
+        elif self.type == self.COMMAND:
+            if self.text == CommandTypes.STATISTICS:
+                response = stats_text()
+            elif self.text == CommandTypes.FAVORITES:
+                response = self.sender.favorites_text()
+            else:
+                command_types_repr = ', '.join(
+                    ["*%s*" %command for command in CommandTypes.LIST]
+                )
+                response = "Prueba con los comandos %s :)" %command_types_repr
+
+        self.sender.send_text(response)
 
     def __str__(self):
         return self.text
