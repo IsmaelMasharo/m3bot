@@ -85,7 +85,7 @@ class MessageEvent(models.Model):
         """
         response = ''
 
-        if self.type == self.LYRICS:
+        if self.type == MessageEventTypes.LYRICS:
             mxm = track_search(self.text)
 
             if mxm.status == 200:
@@ -97,7 +97,7 @@ class MessageEvent(models.Model):
             else:
                 response = "Ups, tuvimos inconvenientes en la búsqueda :o"
 
-        elif self.type == self.FAVORITE:
+        elif self.type == MessageEventTypes.FAVORITE:
             track = self.related_track
             favorites = self.sender.favorites.filter(
                 commontrack_id=track.commontrack_id
@@ -108,7 +108,7 @@ class MessageEvent(models.Model):
                 self.sender.favorites.add(track)
                 response = "Guardamos *%s* como tu favorita!" % track.track_name
 
-        elif self.type == self.COMMAND:
+        elif self.type == MessageEventTypes.COMMAND:
             if self.text == CommandTypes.STATISTICS:
                 response = stats_text()
             elif self.text == CommandTypes.FAVORITES:

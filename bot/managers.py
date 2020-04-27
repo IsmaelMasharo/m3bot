@@ -3,6 +3,7 @@ from django.utils.timezone import now
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.conf import settings
 from .spotify import get_cover_data
+from .choices import MessageEventTypes
 
 def save_user_session(sender):
     from .models import UserSession
@@ -47,12 +48,12 @@ class MessageManager(models.Manager):
         if hook_type == settings.MESSAGE_HOOK:
             message_text = hook_payload['text']
 
-            event_type = MessageEvent.LYRICS
+            event_type = MessageEventTypes.LYRICS
             if (
                 message_text[settings.COMMAND_INDEX_AT] == \
                 settings.COMMAND_IDENTIFIER
             ):
-                event_type = MessageEvent.COMMAND
+                event_type = MessageEventTypes.COMMAND
 
             event.text=message_text
             event.type=event_type
@@ -66,7 +67,7 @@ class MessageManager(models.Manager):
                 raise ValueError
             else:
                 event.related_track = track
-                event.type = MessageEvent.FAVORITE
+                event.type = MessageEventTypes.FAVORITE
 
         event.save()
 
