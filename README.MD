@@ -5,6 +5,10 @@
 searches for related songs in the [Musixmatch API](https://developer.musixmatch.com/) delivering the
 top results. For the album cover art the [Spotify API](https://developer.spotify.com/) is beign used.
 
+# Command Types
+- */favs*: List user favorite songs.
+- */stats*: Show statistics about app usage.
+
 # Prerequisites
 - [virtualenv](https://virtualenv.pypa.io/en/latest/)
 - [postgresql](http://www.postgresql.org/)
