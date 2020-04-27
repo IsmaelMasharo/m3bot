@@ -1,8 +1,6 @@
 
 # Musix Match Messenger - m3bot
 
-Musixmatch bot for Facebook Messenger.
-
 [Messenger](https://developers.facebook.com/docs/messenger-platform) bot that receives some lyrics and
 searches for related songs in the [Musixmatch API](https://developer.musixmatch.com/) delivering the
 top results. For the album cover art the [Spotify API](https://developer.spotify.com/) is beign used.
