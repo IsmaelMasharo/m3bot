@@ -1,7 +1,7 @@
 from .common import *
 
 DEBUG = False
-ALLOWED_HOSTS = ["5f86fd97.ngrok.io", "3.84.82.107/"]
+ALLOWED_HOSTS = ["5f86fd97.ngrok.io", "3.84.82.107"]
 
 DATABASES = {
     'default': {
