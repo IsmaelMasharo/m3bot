@@ -1,5 +1,4 @@
 from django.db import models
-from django.utils.timezone import now
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.conf import settings
 from .spotify import get_cover_data
@@ -8,25 +7,10 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-def save_user_session(sender):
-    from .models import UserSession
-
-    is_new_session = True
-    sessions = UserSession.objects.filter(user__id=sender.id)
-
-    if sessions.exists():
-        last_session = sessions.order_by('end_time').last()
-        if now() - last_session.end_time <= settings.SESSION_TIME_THRESHOLD:
-            is_new_session = False
-            last_session.save()
-
-    if is_new_session:
-        UserSession.objects.create(user=sender)
-
 class MessageManager(models.Manager):
 
     def create_message(self, query):
-        from .models import BotUser, MessageEvent, MxmTrack
+        from .models import BotUser, MessageEvent, MxmTrack, UserSession
 
         [messaging] = query['entry'][-1]['messaging']
 
@@ -43,7 +27,7 @@ class MessageManager(models.Manager):
 
         psid = messaging['sender']['id']
         sender, _ = BotUser.objects.get_or_create(psid=str(psid))
-        save_user_session(sender)
+        UserSession.save_user_session(sender)
 
         event = MessageEvent(sender=sender)
         hook_payload = messaging[hook_type]
@@ -65,9 +49,9 @@ class MessageManager(models.Manager):
             commontrack_id = hook_payload['payload']
             try:
                 track = MxmTrack.objects.get(commontrack_id=commontrack_id)
-            except ObjectDoesNotExist as e:
-                logger.warning("MxmTrack not being correctly saved when fetch.")
-                raise ValueError
+            except ObjectDoesNotExist:
+                logger.warning("MxmTrack not being correctly saved when fetched.")
+                raise ObjectDoesNotExist
             else:
                 event.related_track = track
                 event.type = MessageEventTypes.FAVORITE

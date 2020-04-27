@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.utils.timezone import now
 from .managers import MessageManager, TrackManager
 from .musixmatch import track_search
 from .statistics import stats_text
@@ -64,6 +65,21 @@ class UserSession(models.Model):
     user = models.ForeignKey('BotUser', on_delete=models.CASCADE)
     start_time = models.DateTimeField(auto_now_add=True)
     end_time = models.DateTimeField(auto_now=True)
+
+    @classmethod
+    def save_user_session(cls, sender):
+
+        is_new_session = True
+        sessions = cls.objects.filter(user__id=sender.id)
+
+        if sessions.exists():
+            last_session = sessions.order_by('end_time').last()
+            if now() - last_session.end_time <= settings.SESSION_TIME_THRESHOLD:
+                is_new_session = False
+                last_session.save()
+
+        if is_new_session:
+            cls.objects.create(user=sender)
 
     def __str__(self):
         return str(self.start_time) + " to " + str(self.end_time)
