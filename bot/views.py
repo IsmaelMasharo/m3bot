@@ -10,14 +10,8 @@ logger = logging.getLogger(__name__)
 @csrf_exempt
 def webhook_messenger(request):
     """
-    View that interacts with the Facebook Messenger API.
-
-    A GET method is used to subscribe to the webhook, and POST is used for actual API interaction.
-    It is required that the server returns a 200 status code on every request.
-
-    :param request: HttpRequest sent to the server.
-    :return: HttpResponse that acknowledges the interaction in case it's well-formed according to
-        the API standards.
+    GET: Subscribe to the webhook
+    POST: API interaction.
     """
     response = HttpResponse(status=200, content_type='application/json')
     response.content = 'OK'
