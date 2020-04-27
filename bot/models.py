@@ -99,7 +99,7 @@ class MessageEvent(models.Model):
     def handle_event(self):
         """
         """
-        response = ''
+        msg = ''
 
         if self.type == MessageEventTypes.LYRICS:
             mxm = track_search(self.text)
@@ -109,9 +109,9 @@ class MessageEvent(models.Model):
                     mxm.tracks = mxm.tracks[:settings.DEFAULT_RECORDS_SIZE]
                     return self.sender.send_list_tracks(mxm.tracks)
                 else:
-                    response = "No encontramos canciones :("
+                    msg = "No encontramos canciones :("
             else:
-                response = "Ups, tuvimos inconvenientes en la búsqueda :o"
+                msg = "Ups, tuvimos inconvenientes en la búsqueda :o"
 
         elif self.type == MessageEventTypes.FAVORITE:
             track = self.related_track
@@ -119,23 +119,23 @@ class MessageEvent(models.Model):
                 commontrack_id=track.commontrack_id
             )
             if favorites.exists():
-                response = "*%s* sigue siendo tu favorita :)" % track.track_name
+                msg = "*%s* sigue siendo tu favorita :)" % track.track_name
             else:
                 self.sender.favorites.add(track)
-                response = "Guardamos *%s* como tu favorita!" % track.track_name
+                msg = "Guardamos *%s* como tu favorita!" % track.track_name
 
         elif self.type == MessageEventTypes.COMMAND:
             if self.text == CommandTypes.STATISTICS:
-                response = stats_text()
+                msg = stats_text()
             elif self.text == CommandTypes.FAVORITES:
-                response = self.sender.favorites_text()
+                msg = self.sender.favorites_text()
             else:
                 command_types_repr = ', '.join(
                     ["*%s*" %command for command in CommandTypes.LIST]
                 )
-                response = "Prueba con los comandos %s :)" %command_types_repr
+                msg = "Prueba con los comandos %s :)" %command_types_repr
 
-        self.sender.send_text(response)
+        self.sender.send_text(msg)
 
     def __str__(self):
         return self.text
