@@ -27,6 +27,6 @@ def stats_text():
         average_session=Avg(F('end_time') - F('start_time'))
     )
     average + str(avg_s['average_session']).split(".")[0]
-    msg += "Tiempo promedio por sesión: %s" % average+  + "\n"
+    msg += "Tiempo promedio por sesión: %s" % average + "\n"
 
     return msg
