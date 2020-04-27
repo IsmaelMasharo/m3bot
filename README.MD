@@ -8,6 +8,7 @@ top results. For the album cover art the [Spotify API](https://developer.spotify
 # Command Types
 - */favs*: List user favorite songs.
 - */stats*: Show statistics about app usage.
+- *general text*: Searches for related songs and artists.
 
 # Prerequisites
 - [virtualenv](https://virtualenv.pypa.io/en/latest/)
