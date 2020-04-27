@@ -45,17 +45,17 @@ def webhook_messenger(request):
                     mxm.tracks = mxm.tracks[:settings.DEFAULT_RECORDS_SIZE]
                     user.send_list_tracks(mxm.tracks)
                 else:
-                    user.send_text("Couldn't find lyrics.")
+                    user.send_text("No encontramos canciones :(")
             else:
-                user.send_text("Couldn't contact the lyrics service.")
+                user.send_text("Ups, tuvimos inconvenientes en la búsqueda :o")
 
         elif event.type == MessageEvent.FAVORITE:
             track = event.related_track
             if user.favorites.filter(commontrack_id=track.commontrack_id).exists():
-                user.send_text("\"" + track.track_name + "\" already saved.")
+                user.send_text("*%s* sigue siendo tu favorita :)" % track.track_name)
             else:
                 user.favorites.add(track)
-                user.send_text("\"" + track.track_name + "\" saved as favorite.")
+                user.send_text("Guardamos *%s* como tu favorita!" % track.track_name)
 
         elif event.type == MessageEvent.COMMAND:
             if event.text == "/stat":
@@ -63,7 +63,7 @@ def webhook_messenger(request):
             elif event.text == "/fav":
                 msg = user.favorites_text()
             else:
-                msg = "Try the /stat or /fav commands."
+                msg = "Prueba con los comandos */stat* o */fav* :D"
             user.send_text(msg)
 
         return response

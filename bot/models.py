@@ -46,7 +46,7 @@ class BotUser(models.Model):
         self._send(msg)
 
     def favorites_text(self):
-        msg = "These are your favorite songs:\n"
+        msg = "Tus canciones favoritas :o :\n"
         for favorite in self.favorites.all():
             msg += "- " + str(favorite) + "\n"
         return msg

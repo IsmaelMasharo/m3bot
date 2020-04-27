@@ -3,10 +3,10 @@ from django.db.models import Count, Avg, F
 def stats_text():
     from .models import BotUser, MxmTrack, UserSession
 
-    msg = "*Stats* \n"
+    msg = "*Estadisticas* \n"
 
     # Number of users
-    msg += "Number of users: " + str(BotUser.objects.all().count()) + "\n"
+    msg += "Número de usuarios: " + str(BotUser.objects.all().count()) + "\n"
 
     # Top songs
     track_fav = MxmTrack.objects.annotate(
@@ -17,7 +17,7 @@ def stats_text():
 
     fav_number = min(10, len(track_fav))
     top_songs = track_fav.order_by('num_favorite')[:fav_number]
-    msg += "Top " + str(fav_number) + " favorite songs:\n"
+    msg += "Top " + str(fav_number) + " canciones favoritas:\n"
 
     for song in top_songs:
         msg += "- " + str(song) + "\n"
@@ -26,6 +26,7 @@ def stats_text():
     avg_s = UserSession.objects.aggregate(
         average_session=Avg(F('end_time') - F('start_time'))
     )
-    msg += "Average user session: " + str(avg_s['average_session']) + "\n"
+    average + str(avg_s['average_session'].split(".")[0])
+    msg += "Tiempo promedio por sesión: %s" % average+  + "\n"
 
     return msg

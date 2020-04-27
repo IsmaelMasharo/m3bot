@@ -4,6 +4,9 @@ from spotipy.oauth2 import SpotifyClientCredentials
 from django.conf import settings
 
 import string
+import logging
+
+logger = logging.getLogger(__name__)
 
 # Spotify object
 client_manager = SpotifyClientCredentials(
@@ -14,7 +17,7 @@ client_manager = SpotifyClientCredentials(
 sp = spotipy.Spotify(client_credentials_manager=client_manager)
 
 
-def sp_treat_string(artist: str, track: str):
+def parse_artist_track(artist, track):
     """
     Takes two strings, for artist name and track name, and returns a string that
     Spotify will easily search in its database.
@@ -35,15 +38,17 @@ def sp_treat_string(artist: str, track: str):
 
 
 def get_cover_data(artist_name, track_name):
+    """
+    """
 
     cover_url = None
-    sp_string = sp_treat_string(artist_name, track_name)
+    parsed_track = parse_artist_track(artist_name, track_name)
     try:
-        sp_track = sp.search(sp_string, limit=1)
+        track = sp.search(parsed_track, limit=1)
     except spotipy.client.SpotifyException as e:
-        print(e)
+        logger.exception("Spotify provider exception. %s" % str(e))
     else:
-        sp_track = sp_track['tracks']['items']
-        if sp_track and sp_track[0]['album']['images']:
-            cover_url = sp_track[0]['album']['images'][0]['url']
+        track = track['tracks']['items']
+        if track and track[0]['album']['images']:
+            cover_url = track[0]['album']['images'][0]['url']
     return cover_url
