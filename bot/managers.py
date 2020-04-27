@@ -4,6 +4,9 @@ from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.conf import settings
 from .spotify import get_cover_data
 from .choices import MessageEventTypes
+import logging
+
+logger = logging.getLogger(__name__)
 
 def save_user_session(sender):
     from .models import UserSession
@@ -55,15 +58,15 @@ class MessageManager(models.Manager):
             ):
                 event_type = MessageEventTypes.COMMAND
 
-            event.text=message_text
-            event.type=event_type
+            event.text = message_text
+            event.type = event_type
 
         elif hook_type == settings.POSTBACK_HOOK:
             commontrack_id = hook_payload['payload']
             try:
                 track = MxmTrack.objects.get(commontrack_id=commontrack_id)
             except ObjectDoesNotExist as e:
-                print(e)
+                logger.warning("MxmTrack not being correctly saved when fetch.")
                 raise ValueError
             else:
                 event.related_track = track
@@ -90,34 +93,28 @@ class TrackManager(models.Manager):
         from .models import MxmTrack
 
         try:
-            commontrack_id = data['commontrack_id']
-            artist_name = data['artist_name']
-            track_name = data['track_name']
-            artist_id = data['artist_id']
-            album_id = data['album_id']
-            album_name = data['album_name']
-            track_url = data['track_share_url']
-            try:
-                vanity_id = data['commontrack_vanity_id']
-            except KeyError:
-                vanity_id = artist_name + " - " + track_name
-
-            cover_url = get_cover_data(artist_name, track_name)
-
             track = MxmTrack(
-                commontrack_id=commontrack_id,
-                artist_name=artist_name,
-                track_name=track_name,
-                artist_id=artist_id,
-                album_id=album_id,
-                image_url=cover_url,
-                track_url=track_url,
-                album_name=album_name,
-                vanity_id=vanity_id
+                commontrack_id = data['commontrack_id'],
+                artist_name = data['artist_name'],
+                track_name = data['track_name'],
+                artist_id = data['artist_id'],
+                album_id = data['album_id'],
+                album_name = data['album_name'],
+                track_url = data['track_share_url']
             )
+
+            track.image_url = get_cover_data(
+                track.artist_name, track.track_name
+            )
+
+            track.vanity_id = data.get('commontrack_vanity_id', 
+                " - ".join([track.artist_name, track.track_name])
+            )
+
             track.save()
+
             return track
         except (ValidationError, KeyError, AttributeError) as e:
-            print(e)
+            logger.warning("MxmTrack saving error after fetch.")
             raise ValueError("The data doesn't have the form of a track.")
 
