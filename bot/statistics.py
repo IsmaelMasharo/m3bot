@@ -22,10 +22,10 @@ def stats_text():
     for song in top_songs:
         msg += "- " + str(song) + "\n"
 
-    # Average session length
-    # avg_s = UserSession.objects.aggregate(
-    #     average_session=Avg(F('end_time') - F('start_time'))
-    # )
-    # msg += "Average user session length: " + str(avg_s['average_session']) + "\n"
+    # Average user session
+    avg_s = UserSession.objects.aggregate(
+        average_session=Avg(F('end_time') - F('start_time'))
+    )
+    msg += "Average user session: " + str(avg_s['average_session']) + "\n"
 
     return msg
