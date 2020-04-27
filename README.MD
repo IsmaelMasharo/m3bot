@@ -50,5 +50,5 @@ sudo -u postgres createdb m3db
 
 Migrate the database:
 ```bash
-python urbaner/manage.py migrate
+python manage.py migrate
 ```
